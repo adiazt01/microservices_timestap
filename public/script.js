@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultDiv = document.getElementById("result");
 
     submitBtn.addEventListener("click", () => {
+        M.AutoInit();
         const date = dateInput.value;
         fetch(`/api/${encodeURIComponent(date)}`)
             .then((response) => response.json())
