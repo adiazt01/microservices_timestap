@@ -1,43 +1,35 @@
 const express = require("express");
-
 const app = express();
+const cors = require("cors");
 
-app.use(express.static(__dirname + "/public"));
+app.use(cors());
+app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/views/index.html");
+  res.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/index.css", (req, res) => {
-  res.sendFile(__dirname + "/public/views/index.css");
-});
+app.get("/api/:date?", (req, res) => {
+  const dateParam = req.params.date;
+  let date;
 
-/* app.get('/main.css', (req, res) => {
-  res.sendFile(__dirname + '/main.css')
-}) */
-
-app.get("/api/converter", (req, res, next) => {
-  if (!req.query.date) {
-    return res.json({
-      unix: new Date(),
-      utc: new Date(),
-    });
-  }
-
-  if (req.query.date.length < 9) {
-    res.json({
-      unix: new Date(req.query.date),
-      utc: new Date(req.query.date),
-    });
+  if (!dateParam) {
+      date = new Date(); 
+  } else if (!isNaN(dateParam)) {
+      date = new Date(parseInt(dateParam)); 
   } else {
-    const dateTimeMiliseconds = parseInt(req.query.date) * 1000;
-    res.json({
-      unix: new Date(req.query.date),
-      utc: new Date(dateTimeMiliseconds),
-    });
+      date = new Date(dateParam);
   }
 
-  next();
+  if (isNaN(date)) {
+      res.json({ error: "Invalid Date" });
+  } else {
+      res.json({ unix: date.getTime(), utc: date.toUTCString() });
+  }
 });
 
-app.listen("3000");
+
+
+const listener = app.listen("3000", () => {
+  console.log("Your app is listening on port " + listener.address().port);
+});
